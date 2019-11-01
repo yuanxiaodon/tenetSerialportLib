@@ -1,5 +1,4 @@
 # tenetSerialportLib
-串口工具
 [![](https://jitpack.io/v/yuanxiaodon/tenetSerialportLib.svg)](https://jitpack.io/#yuanxiaodon/tenetSerialportLib)
 
 串口实例调用方法

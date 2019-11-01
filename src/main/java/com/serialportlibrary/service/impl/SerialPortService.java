@@ -56,6 +56,10 @@ public class SerialPortService implements ISerialPortService, Runnable {
     byte[] buffer = new byte[1024];
     //串口监听回调
     private SerialPortListener portListener;
+    //是否自定义数据接收方式
+    private boolean mAnalyseReceive;
+
+
 
 
     /**
@@ -66,11 +70,12 @@ public class SerialPortService implements ISerialPortService, Runnable {
      * @param timeOut    数据返回超时时间
      * @throws IOException 打开串口出错
      */
-    public SerialPortService(String devicePath, int baudrate, Long timeOut, int pkgLength) throws IOException {
+    public SerialPortService(String devicePath, int baudrate, Long timeOut, int pkgLength,boolean isAnalyseReceive) throws IOException {
         mTimeOut = timeOut;
         mDevicePath = devicePath;
         mBaudrate = baudrate;
         mPkgLength = pkgLength;
+        mAnalyseReceive = isAnalyseReceive;
         mSerialPort = new SerialPort(new File(mDevicePath), mBaudrate);
         inputStream = mSerialPort.getInputStream();
         outputStream = mSerialPort.getOutputStream();
@@ -85,7 +90,7 @@ public class SerialPortService implements ISerialPortService, Runnable {
      * @param timeOut    数据返回超时时间
      * @throws IOException 打开串口出错
      */
-    public SerialPortService(String devicePath, int baudrate, Long timeOut, int dataBits, int stopBits, int parity, int pkgLength) throws IOException {
+    public SerialPortService(String devicePath, int baudrate, Long timeOut, int dataBits, int stopBits, int parity, int pkgLength,boolean isAnalyseReceive) throws IOException {
         mTimeOut = timeOut;
         mDevicePath = devicePath;
         mBaudrate = baudrate;
@@ -93,6 +98,7 @@ public class SerialPortService implements ISerialPortService, Runnable {
         mStopBits = stopBits;
         mParity = parity;
         mPkgLength = pkgLength;
+        mAnalyseReceive = isAnalyseReceive;
         mSerialPort = new SerialPort(new File(mDevicePath), mBaudrate, mDataBits, mStopBits, mParity);
         inputStream = mSerialPort.getInputStream();
         outputStream = mSerialPort.getOutputStream();
@@ -180,13 +186,23 @@ public class SerialPortService implements ISerialPortService, Runnable {
                 if (currentLength < 0) {
                     currentLength = 0;
                 }
-                while (currentLength >= mPkgLength) {
-                    String recinfo = new String(buffer, 0, currentLength);
-                    currentTime = 0;
-                    currentLength = 0;
-                    LogUtil.e("接收到串口信息:" + recinfo);
-                    if (null != portListener) {
-                        portListener.onReceive(recinfo);
+                if(mAnalyseReceive){
+                    while (currentLength >= mPkgLength) {
+                        if (null != portListener) {
+                            portListener.onAnalyseReceive(currentLength, buffer);
+                        }
+                        currentTime = 0;
+                    }
+                }
+                else {
+                    while (currentLength >= mPkgLength) {
+                        String recinfo = new String(buffer, 0, currentLength);
+                        currentTime = 0;
+                        currentLength = 0;
+                        LogUtil.e("接收到串口信息:" + recinfo);
+                        if (null != portListener) {
+                            portListener.onReceive(recinfo);
+                        }
                     }
                 }
 //                    SystemClock.sleep(RE_READ_WAITE_TIME);
@@ -207,4 +223,3 @@ public class SerialPortService implements ISerialPortService, Runnable {
 
 
 }
-

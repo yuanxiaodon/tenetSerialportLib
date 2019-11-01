@@ -8,5 +8,7 @@ public interface SerialPortListener {
 
     public void onReceive(String content);
 
+    public void onAnalyseReceive(Integer receiveLength, byte[] receiveBuffer);
+
     public void onReceiveTimeout();
 }

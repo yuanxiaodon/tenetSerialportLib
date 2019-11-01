@@ -21,6 +21,8 @@ public class SerialPortBuilder {
     private int mParity;
     //默认完整包的长度
     private int mPkgLength = 1;
+    //是否自定义数据接收方式
+    private boolean mAnalyseReceive = false;
 
     public SerialPortBuilder setBaudrate(int baudrate) {
         mBaudrate = baudrate;
@@ -59,10 +61,16 @@ public class SerialPortBuilder {
         return this;
     }
 
+
+    public SerialPortBuilder setmAnalyseReceive(boolean isAnalyseReceive) {
+        this.mAnalyseReceive = isAnalyseReceive;
+        return this;
+    }
+
     public SerialPortService createService() {
         SerialPortService serialPortService = null;
         try {
-            serialPortService = new SerialPortService(mDevicePath, mBaudrate, mTimeOut, mPkgLength);
+            serialPortService = new SerialPortService(mDevicePath, mBaudrate, mTimeOut, mPkgLength,mAnalyseReceive);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -72,7 +80,7 @@ public class SerialPortBuilder {
     public SerialPortService createServiceFill() {
         SerialPortService serialPortService = null;
         try {
-            serialPortService = new SerialPortService(mDevicePath, mBaudrate, mTimeOut, mDataBits, mStopBits, mParity, mPkgLength);
+            serialPortService = new SerialPortService(mDevicePath, mBaudrate, mTimeOut, mDataBits, mStopBits, mParity, mPkgLength,mAnalyseReceive);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -81,4 +89,3 @@ public class SerialPortBuilder {
 
 
 }
-
